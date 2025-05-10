@@ -1,0 +1,62 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block title %}{{ title }} | {{ site_title|default:_('Sistema de Gestión de Pacientes') }}{% endblock %}
+
+{% block branding %}
+<h1 id="site-name">
+    <a href="{% url 'admin:index' %}">
+        Sistema de Gestión de Pacientes IPS MAX
+    </a>
+</h1>
+{% endblock %}
+
+{% block extrastyle %}
+<style>
+    :root {
+        --primary: #006699;
+        --secondary: #0088cc;
+        --accent: #00aaff;
+        --primary-fg: #fff;
+        --body-fg: #333;
+        --body-bg: #fff;
+        --header-color: #fff;
+        --header-branding-color: var(--accent);
+        --header-bg: var(--primary);
+        --header-link-color: var(--primary-fg);
+    }
+    
+    #header {
+        background: var(--primary);
+        color: var(--header-color);
+    }
+    
+    #branding h1 {
+        color: var(--header-branding-color);
+    }
+    
+    a:link, a:visited {
+        color: var(--primary);
+    }
+    
+    .module h2, .module caption, .inline-group h2 {
+        background: var(--primary);
+    }
+    
+    .button, input[type=submit], input[type=button], .submit-row input, a.button {
+        background: var(--primary);
+    }
+    
+    .button:hover, input[type=submit]:hover, input[type=button]:hover {
+        background: var(--secondary);
+    }
+    
+    .button.default, input[type=submit].default, .submit-row input.default {
+        background: var(--secondary);
+    }
+    
+    .button.default:hover, input[type=submit].default:hover {
+        background: var(--accent);
+    }
+</style>
+{% endblock %}

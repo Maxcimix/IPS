@@ -1,0 +1,18 @@
+{% extends "admin/index.html" %}
+{% load i18n %}
+
+{% block content %}
+<div id="content-main">
+    <div class="app-dashboard module">
+        <h2>Bienvenido a la IPS MAX</h2>
+        <p>Proyecto enfocado para creacion de sistemas de salud</p>
+        <p>Utilice el menú de la izquierda para acceder a los diferentes módulos del sistema:</p>
+        <ul>
+            <li><strong>Pacientes:</strong> Consulta, registro y actualización de datos de pacientes.</li>
+            <li><strong>Contactos con Servicio de Salud:</strong> Gestión de las atenciones realizadas a los pacientes.</li>
+        </ul>
+    </div>
+    
+    {{ block.super }}
+</div>
+{% endblock %}

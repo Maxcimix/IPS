@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if form.instance.pk %}Editar{% else %}Nuevo{% endif %} Contacto con Servicio de Salud{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h2>{% if form.instance.pk %}Editar{% else %}Nuevo{% endif %} Contacto con Servicio de Salud</h2>
+                </div>
+                <div class="card-body">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h4>Información del Paciente</h4>
+                            </div>
+                            <div class="col-md-12 mb-3">
+                                <label for="{{ form.paciente.id_for_label }}" class="form-label">{{ form.paciente.label }}</label>
+                                {{ form.paciente }}
+                                {% if form.paciente.errors %}
+                                <div class="text-danger">{{ form.paciente.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h4>Información de la Atención</h4>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.fecha_inicio_atencion.id_for_label }}" class="form-label">{{ form.fecha_inicio_atencion.label }}</label>
+                                {{ form.fecha_inicio_atencion }}
+                                {% if form.fecha_inicio_atencion.errors %}
+                                <div class="text-danger">{{ form.fecha_inicio_atencion.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.prestador_servicio.id_for_label }}" class="form-label">{{ form.prestador_servicio.label }}</label>
+                                {{ form.prestador_servicio }}
+                                {% if form.prestador_servicio.errors %}
+                                <div class="text-danger">{{ form.prestador_servicio.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Resto del formulario (puedes agregar más campos según sea necesario) -->
+                        
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-primary">Guardar</button>
+                            <a href="{% url 'contacto_servicio:contacto-list' %}" class="btn btn-secondary">Cancelar</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

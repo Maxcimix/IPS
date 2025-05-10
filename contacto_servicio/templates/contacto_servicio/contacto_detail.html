@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block title %}Detalle de Contacto con Servicio de Salud{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Contacto con Servicio de Salud</h2>
+                    <h5>Paciente: {{ contacto.paciente.nombre_completo }}</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h4>Información de la Atención</h4>
+                            <p><strong>Fecha de Inicio:</strong> {{ contacto.fecha_inicio_atencion }}</p>
+                            <p><strong>Prestador del Servicio:</strong> {{ contacto.prestador_servicio }}</p>
+                            <p><strong>Profesional de Salud:</strong> {{ contacto.profesional_salud }}</p>
+                            <p><strong>Ámbito de Realización:</strong> {{ contacto.get_ambito_realizacion_display }}</p>
+                            <p><strong>Modalidad de Atención:</strong> {{ contacto.get_modalidad_atencion_display }}</p>
+                            <p><strong>Tipo de Atención:</strong> {{ contacto.get_tipo_atencion_display }}</p>
+                            <p><strong>Vía de Ingreso:</strong> {{ contacto.get_via_ingreso_display }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h4>Información Clínica</h4>
+                            <p><strong>Causa Externa:</strong> {{ contacto.get_causa_externa_display }}</p>
+                            {% if contacto.clasificacion_triage %}
+                            <p><strong>Clasificación Triage:</strong> {{ contacto.get_clasificacion_triage_display }}</p>
+                            {% endif %}
+                            <p><strong>Diagnóstico Principal:</strong> {{ contacto.diagnostico_principal }}</p>
+                            <p><strong>Tipo de Diagnóstico:</strong> {{ contacto.get_tipo_diagnostico_display }}</p>
+                            {% if contacto.tipo_tecnologia %}
+                            <p><strong>Tipo de Tecnología:</strong> {{ contacto.get_tipo_tecnologia_display }}</p>
+                            {% endif %}
+                            {% if contacto.codigo_tecnologia %}
+                            <p><strong>Código de Tecnología:</strong> {{ contacto.codigo_tecnologia }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row mt-4">
+                        <div class="col-md-12">
+                            <h4>Finalización y Observaciones</h4>
+                            {% if contacto.fecha_fin_atencion %}
+                            <p><strong>Fecha de Fin:</strong> {{ contacto.fecha_fin_atencion }}</p>
+                            {% endif %}
+                            {% if contacto.observaciones %}
+                            <p><strong>Observaciones:</strong></p>
+                            <div class="card">
+                                <div class="card-body">
+                                    {{ contacto.observaciones|linebreaks }}
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="btn-group">
+                        <a href="{% url 'contacto_servicio:contacto-list' %}" class="btn btn-secondary">Volver</a>
+                        <a href="{% url 'contacto_servicio:contacto-update' contacto.id %}" class="btn btn-warning">Editar</a>
+                        <a href="{% url 'contacto_servicio:contacto-delete' contacto.id %}" class="btn btn-danger">Eliminar</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block title %}Detalle de Paciente{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h2>{{ paciente.nombre_completo }}</h2>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h4>Información Personal</h4>
+                            <p><strong>Tipo de Documento:</strong> {{ paciente.get_tipo_documento_display }}</p>
+                            <p><strong>Número de Documento:</strong> {{ paciente.numero_documento }}</p>
+                            <p><strong>Nombres:</strong> {{ paciente.primer_nombre }} {{ paciente.segundo_nombre|default:'' }}</p>
+                            <p><strong>Apellidos:</strong> {{ paciente.primer_apellido }} {{ paciente.segundo_apellido|default:'' }}</p>
+                            <p><strong>Fecha de Nacimiento:</strong> {{ paciente.fecha_nacimiento }}</p>
+                            <p><strong>Sexo:</strong> {{ paciente.get_sexo_display }}</p>
+                            <p><strong>Género:</strong> {{ paciente.get_genero_display }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h4>Información de Contacto</h4>
+                            <p><strong>Teléfono:</strong> {{ paciente.telefono }}</p>
+                            <p><strong>Email:</strong> {{ paciente.email|default:'No registrado' }}</p>
+                            <p><strong>Dirección:</strong> {{ paciente.direccion }}</p>
+                            <p><strong>País:</strong> {{ paciente.get_pais_residencia_display }}</p>
+                            <p><strong>Departamento:</strong> {{ paciente.departamento_residencia }}</p>
+                            <p><strong>Municipio:</strong> {{ paciente.municipio_residencia }}</p>
+                            <p><strong>Zona:</strong> {{ paciente.get_zona_residencia_display }}</p>
+                        </div>
+                    </div>
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <h4>Información de Aseguramiento</h4>
+                            <p><strong>Entidad Administradora:</strong> {{ paciente.entidad_administradora }}</p>
+                            <p><strong>Régimen:</strong> {{ paciente.regimen }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h4>Información Adicional</h4>
+                            <p><strong>Pertenencia Étnica:</strong> {{ paciente.get_pertenencia_etnica_display }}</p>
+                            {% if paciente.comunidad_indigena %}
+                            <p><strong>Comunidad Indígena:</strong> {{ paciente.comunidad_indigena }}</p>
+                            {% endif %}
+                            <p><strong>Discapacidad:</strong> {{ paciente.get_discapacidad_display }}</p>
+                            <p><strong>Donante de Órganos:</strong> {{ paciente.get_donante_organos_display }}</p>
+                            <p><strong>Voluntad Anticipada:</strong> {{ paciente.get_voluntad_anticipada_display }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="btn-group">
+                        <a href="{% url 'pacientes:paciente-list' %}" class="btn btn-secondary">Volver</a>
+                        <a href="{% url 'pacientes:paciente-update' paciente.id %}" class="btn btn-warning">Editar</a>
+                        <a href="{% url 'pacientes:paciente-delete' paciente.id %}" class="btn btn-danger">Eliminar</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

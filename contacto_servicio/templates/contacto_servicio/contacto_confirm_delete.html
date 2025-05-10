@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}Eliminar Contacto con Servicio de Salud{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h2>Eliminar Contacto con Servicio de Salud</h2>
+                </div>
+                <div class="card-body">
+                    <p class="lead">¿Estás seguro de que deseas eliminar este contacto con servicio de salud?</p>
+                    <p><strong>Paciente:</strong> {{ contacto.paciente.nombre_completo }}</p>
+                    <p><strong>Fecha:</strong> {{ contacto.fecha_inicio_atencion }}</p>
+                    <p><strong>Diagnóstico:</strong> {{ contacto.diagnostico_principal }}</p>
+                    <p class="text-danger">Esta acción no se puede deshacer.</p>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-danger">Sí, Eliminar</button>
+                            <a href="{% url 'contacto_servicio:contacto-list' %}" class="btn btn-secondary">Cancelar</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
