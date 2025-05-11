@@ -8,5 +8,5 @@ urlpatterns = [
     path('<int:pk>/', views.PacienteDetailView.as_view(), name='paciente_detail'),
     path('nuevo/', views.PacienteCreateView.as_view(), name='paciente_create'),
     path('<int:pk>/editar/', views.PacienteUpdateView.as_view(), name='paciente_update'),
-    path('<int:pk>/eliminar/', views.PacienteDeleteView.as_view(), name='paciente_confirm_delete.html'),
+    path('<int:pk>/eliminar/', views.PacienteDeleteView.as_view(), name='paciente_delete'),
 ]
