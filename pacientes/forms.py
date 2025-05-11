@@ -1,12 +1,15 @@
+# pacientes/forms.py
+
 from django import forms
 from .models import Paciente
 
 class PacienteForm(forms.ModelForm):
     class Meta:
         model = Paciente
-        fields = '__all__'
+        exclude = ('ocupaciones', 'discapacidades', 'nacionalidades')
         widgets = {
             'fecha_nacimiento': forms.DateInput(attrs={'type': 'date'}),
+            'hora_nacimiento': forms.TimeInput(attrs={'type': 'time'}),
             'primer_apellido': forms.TextInput(attrs={'class': 'form-control'}),
             'segundo_apellido': forms.TextInput(attrs={'class': 'form-control'}),
             'primer_nombre': forms.TextInput(attrs={'class': 'form-control'}),
@@ -15,9 +18,4 @@ class PacienteForm(forms.ModelForm):
             'telefono': forms.TextInput(attrs={'class': 'form-control'}),
             'email': forms.EmailInput(attrs={'class': 'form-control'}),
             'direccion': forms.TextInput(attrs={'class': 'form-control'}),
-            'departamento_residencia': forms.TextInput(attrs={'class': 'form-control'}),
-            'municipio_residencia': forms.TextInput(attrs={'class': 'form-control'}),
-            'comunidad_indigena': forms.TextInput(attrs={'class': 'form-control'}),
-            'entidad_administradora': forms.TextInput(attrs={'class': 'form-control'}),
-            'regimen': forms.TextInput(attrs={'class': 'form-control'}),
         }

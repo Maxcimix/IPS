@@ -1,136 +1,162 @@
+# contacto_servicio/models.py
+
 from django.db import models
 from pacientes.models import Paciente
 
+# Enumeraciones (menos de 5 opciones)
+AMBITO_REALIZACION = [
+    ('01', 'Ambulatorio'),
+    ('02', 'Hospitalario'),
+    ('03', 'Urgencias'),
+    ('04', 'Domiciliario'),
+    ('05', 'Extramural Jornada de Salud'),
+]
+
+MODALIDAD_ATENCION = [
+    ('01', 'Intramural'),
+    ('02', 'Extramural'),
+    ('03', 'Telemedicina'),
+]
+
+TIPO_ATENCION = [
+    ('01', 'Consulta externa'),
+    ('02', 'Servicio de urgencias'),
+    ('03', 'Hospitalización'),
+    ('04', 'Quirúrgico'),
+    ('05', 'Atención Inmediata'),
+]
+
+CLASIFICACION_TRIAGE = [
+    ('1', 'Triage I'),
+    ('2', 'Triage II'),
+    ('3', 'Triage III'),
+    ('4', 'Triage IV'),
+    ('5', 'Triage V'),
+]
+
+TIPO_DIAGNOSTICO = [
+    ('01', 'Impresión diagnóstica'),
+    ('02', 'Confirmado nuevo'),
+    ('03', 'Confirmado repetido'),
+]
+
+# Modelos para campos con más de 5 opciones
+class ViaIngreso(models.Model):
+    codigo = models.CharField(max_length=2, primary_key=True)
+    nombre = models.CharField(max_length=100)
+    
+    class Meta:
+        verbose_name = 'Vía de Ingreso'
+        verbose_name_plural = 'Vías de Ingreso'
+        ordering = ['codigo']
+    
+    def __str__(self):
+        return self.nombre
+
+class CausaExterna(models.Model):
+    codigo = models.CharField(max_length=2, primary_key=True)
+    nombre = models.CharField(max_length=255)
+    
+    class Meta:
+        verbose_name = 'Causa Externa'
+        verbose_name_plural = 'Causas Externas'
+        ordering = ['codigo']
+    
+    def __str__(self):
+        return self.nombre
+
+class TipoTecnologia(models.Model):
+    codigo = models.CharField(max_length=2, primary_key=True)
+    nombre = models.CharField(max_length=100)
+    
+    class Meta:
+        verbose_name = 'Tipo de Tecnología'
+        verbose_name_plural = 'Tipos de Tecnología'
+        ordering = ['codigo']
+    
+    def __str__(self):
+        return self.nombre
+
+class DiagnosticoCIE10(models.Model):
+    codigo = models.CharField(max_length=10, primary_key=True)
+    descripcion = models.CharField(max_length=255)
+    codigo_padre = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='hijos')
+    nivel = models.IntegerField()
+    
+    class Meta:
+        verbose_name = 'Diagnóstico CIE-10'
+        verbose_name_plural = 'Diagnósticos CIE-10'
+        ordering = ['codigo']
+    
+    def __str__(self):
+        return f"{self.codigo} - {self.descripcion}"
+
+class PrestadorServicio(models.Model):
+    codigo_habilitacion = models.CharField(max_length=20, primary_key=True)
+    nombre = models.CharField(max_length=255)
+    direccion = models.CharField(max_length=255)
+    telefono = models.CharField(max_length=20)
+    email = models.EmailField(null=True, blank=True)
+    tipo_prestador = models.CharField(max_length=100)
+    
+    class Meta:
+        verbose_name = 'Prestador de Servicio'
+        verbose_name_plural = 'Prestadores de Servicio'
+        ordering = ['nombre']
+    
+    def __str__(self):
+        return f"{self.nombre} ({self.codigo_habilitacion})"
+
+class ProfesionalSalud(models.Model):
+    tipo_documento = models.CharField(max_length=2)
+    numero_documento = models.CharField(max_length=20)
+    primer_apellido = models.CharField(max_length=50)
+    segundo_apellido = models.CharField(max_length=50, blank=True, null=True)
+    primer_nombre = models.CharField(max_length=50)
+    segundo_nombre = models.CharField(max_length=50, blank=True, null=True)
+    especialidad = models.CharField(max_length=100)
+    registro_profesional = models.CharField(max_length=50)
+    prestador = models.ForeignKey(PrestadorServicio, on_delete=models.PROTECT, related_name='profesionales',null=True, blank=True)
+    
+    class Meta:
+        verbose_name = 'Profesional de Salud'
+        verbose_name_plural = 'Profesionales de Salud'
+        ordering = ['primer_apellido', 'primer_nombre']
+        unique_together = ('tipo_documento', 'numero_documento')
+    
+    def __str__(self):
+        return f"{self.primer_apellido} {self.primer_nombre} - {self.especialidad}"
+    
+    def nombre_completo(self):
+        return f"{self.primer_nombre} {self.segundo_nombre or ''} {self.primer_apellido} {self.segundo_apellido or ''}"
+
+# Modelo principal de Contacto con Servicio de Salud
 class ContactoServicio(models.Model):
-    
-    AMBITO_REALIZACION_CHOICES = [
-        ('01', 'Ambulatorio'),
-        ('02', 'Hospitalario'),
-        ('03', 'Urgencias'),
-        ('04', 'Domiciliario'),
-        ('05', 'Extramural Jornada de Salud'),
-        ('06', 'Extramural Unidad Móvil'),
-        ('07', 'Telemedicina no interactiva'),
-        ('08', 'Telemedicina-Telexperticia'),
-        ('09', 'Telemedicina-Teleorientación'),
-    ]
-    
-    MODALIDAD_ATENCION_CHOICES = [
-        ('01', 'Intramural'),
-        ('02', 'Extramural'),
-        ('03', 'Telemedicina'),
-    ]
-    
-    TIPO_ATENCION_CHOICES = [
-        ('01', 'Consulta externa'),
-        ('02', 'Servicio de urgencias'),
-        ('03', 'Hospitalización'),
-        ('04', 'Quirúrgico'),
-        ('05', 'Atención Inmediata'),
-    ]
-    
-    VIA_INGRESO_CHOICES = [
-        ('01', 'Consulta externa'),
-        ('02', 'Remisión externa'),
-        ('03', 'Servicio de urgencias'),
-        ('04', 'Derivado de hospitalización'),
-        ('05', 'Derivado de sala de cirugía'),
-        ('06', 'Derivado de sala de partos'),
-        ('07', 'Recién nacido en la institución'),
-        ('08', 'Derivado de atención domiciliaria'),
-        ('09', 'Derivado de telemedicina'),
-        ('10', 'Derivado de otro servicio de salud'),
-        ('11', 'Referido'),
-    ]
-    
-    CAUSA_EXTERNA_CHOICES = [
-        ('01', 'Enfermedad general de origen común'),
-        ('02', 'Accidente de tránsito'),
-        ('03', 'Accidente de origen laboral'),
-        ('04', 'Accidente en el hogar'),
-        ('05', 'Evento de origen natural'),
-        ('06', 'Lesión por agresión'),
-        ('07', 'Lesión auto infligida'),
-        ('08', 'Sospecha de violencia física'),
-        ('09', 'Sospecha de violencia psicológica'),
-        ('10', 'Sospecha de violencia sexual'),
-        ('11', 'Sospecha de negligencia y abandono'),
-        ('12', 'IVE relacionado con peligro a la salud o vida de la mujer'),
-        ('13', 'IVE por malformación congénita incompatible con la vida'),
-        ('14', 'IVE por violencia sexual, incesto o por inseminación artificial o transferencia de ovulo fecundado no consentida'),
-        ('15', 'Evento adverso en salud'),
-        ('16', 'Enfermedad general'),
-        ('17', 'Enfermedad laboral'),
-        ('18', 'Promoción y mantenimiento de la salud-Intervenciones individuales'),
-        ('19', 'Eventos Catastróficos'),
-        ('20', 'Accidente de mina antipersonal-MAP'),
-        ('21', 'Accidente de Artefacto Explosivo Improvisado -AEI'),
-        ('22', 'Accidente de Munición Sin Explotar-MUSE'),
-        ('23', 'Otra víctima de conflicto armado colombiano'),
-    ]
-    
-    CLASIFICACION_TRIAGE_CHOICES = [
-        ('1', 'Triage I'),
-        ('2', 'Triage II'),
-        ('3', 'Triage III'),
-        ('4', 'Triage IV'),
-        ('5', 'Triage V'),
-    ]
-    
-    TIPO_DIAGNOSTICO_CHOICES = [
-        ('01', 'Impresión diagnóstica'),
-        ('02', 'Confirmado nuevo'),
-        ('03', 'Confirmado repetido'),
-    ]
-    
-    TIPO_TECNOLOGIA_CHOICES = [
-        ('01', 'Procedimiento en salud'),
-        ('02', 'Medicamento con registro sanitario'),
-        ('03', 'Medicamento vital no disponible'),
-        ('04', 'Preparación magistral'),
-        ('05', 'Medicamento no incluido'),
-        ('06', 'Componentes sanguíneos'),
-        ('07', 'Fluidos orgánicos'),
-        ('08', 'Órganos'),
-        ('09', 'Tejidos'),
-        ('10', 'Células'),
-        ('11', 'Producto nutricional'),
-        ('12', 'Servicio complementario'),
-    ]
-    
-   
+    # Relación con Paciente
     paciente = models.ForeignKey(Paciente, on_delete=models.CASCADE, related_name='contactos_servicio', verbose_name='Paciente')
     
+    # Relaciones con modelos de catálogo
+    prestador = models.ForeignKey(PrestadorServicio, on_delete=models.PROTECT, related_name='contactos_servicio', verbose_name='Prestador de servicio')
+    profesional = models.ForeignKey(ProfesionalSalud, on_delete=models.PROTECT, related_name='contactos_servicio', verbose_name='Profesional de salud')
+    via_ingreso = models.ForeignKey(ViaIngreso, on_delete=models.PROTECT, verbose_name='Vía de ingreso')
+    causa_externa = models.ForeignKey(CausaExterna, on_delete=models.PROTECT, verbose_name='Causa externa')
+    diagnostico_principal = models.ForeignKey(DiagnosticoCIE10, on_delete=models.PROTECT, related_name='contactos_servicio', verbose_name='Diagnóstico principal')
+    tipo_tecnologia = models.ForeignKey(TipoTecnologia, on_delete=models.PROTECT, null=True, blank=True, verbose_name='Tipo de tecnología')
     
+    # Campos con enumeraciones (menos de 5 opciones)
+    ambito_realizacion = models.CharField(max_length=2, choices=AMBITO_REALIZACION, verbose_name='Ámbito de realización')
+    modalidad_atencion = models.CharField(max_length=2, choices=MODALIDAD_ATENCION, verbose_name='Modalidad de atención')
+    tipo_atencion = models.CharField(max_length=2, choices=TIPO_ATENCION, verbose_name='Tipo de atención')
+    clasificacion_triage = models.CharField(max_length=1, choices=CLASIFICACION_TRIAGE, blank=True, null=True, verbose_name='Clasificación Triage')
+    tipo_diagnostico = models.CharField(max_length=2, choices=TIPO_DIAGNOSTICO, verbose_name='Tipo de diagnóstico')
+    
+    # Otros campos
     fecha_inicio_atencion = models.DateTimeField(verbose_name='Fecha y hora de inicio de atención')
-    prestador_servicio = models.CharField(max_length=100, verbose_name='Prestador del servicio')
-    profesional_salud = models.CharField(max_length=100, verbose_name='Profesional de salud')
-    
-    
-    ambito_realizacion = models.CharField(max_length=2, choices=AMBITO_REALIZACION_CHOICES, verbose_name='Ámbito de realización')
-    modalidad_atencion = models.CharField(max_length=2, choices=MODALIDAD_ATENCION_CHOICES, verbose_name='Modalidad de atención')
-    tipo_atencion = models.CharField(max_length=2, choices=TIPO_ATENCION_CHOICES, verbose_name='Tipo de atención')
-    
-    
-    via_ingreso = models.CharField(max_length=2, choices=VIA_INGRESO_CHOICES, verbose_name='Vía de ingreso')
-    causa_externa = models.CharField(max_length=2, choices=CAUSA_EXTERNA_CHOICES, verbose_name='Causa externa')
-    
-    
-    clasificacion_triage = models.CharField(max_length=1, choices=CLASIFICACION_TRIAGE_CHOICES, blank=True, null=True, verbose_name='Clasificación Triage')
-    diagnostico_principal = models.CharField(max_length=10, verbose_name='Diagnóstico principal (CIE-10)')
-    tipo_diagnostico = models.CharField(max_length=2, choices=TIPO_DIAGNOSTICO_CHOICES, verbose_name='Tipo de diagnóstico')
-    
-    
-    tipo_tecnologia = models.CharField(max_length=2, choices=TIPO_TECNOLOGIA_CHOICES, blank=True, null=True, verbose_name='Tipo de tecnología')
+    fecha_fin_atencion = models.DateTimeField(verbose_name='Fecha y hora de fin de atención', null=True, blank=True)
     codigo_tecnologia = models.CharField(max_length=20, blank=True, null=True, verbose_name='Código de tecnología')
-    
-    
-    fecha_fin_atencion = models.DateTimeField(blank=True, null=True, verbose_name='Fecha y hora de fin de atención')
-    
-    
     observaciones = models.TextField(blank=True, null=True, verbose_name='Observaciones')
     
-   
+    # Campos de auditoría
     fecha_creacion = models.DateTimeField(auto_now_add=True, verbose_name='Fecha de creación')
     fecha_actualizacion = models.DateTimeField(auto_now=True, verbose_name='Fecha de actualización')
     
